@@ -31,7 +31,17 @@ class CheckboxesFieldUnitTest extends \PHPUnit\Framework\TestCase
                     'session-id' => 'sid',
                     'remote-source' => 'http://ya.ru',
                     'type' => 'int',
-                    'class' => 'cls'
+                    'class' => 'cls',
+                    'items' => [
+                        [
+                            'id' => 111,
+                            'title' => 'title1'
+                        ],
+                        [
+                            'id' => 222,
+                            'title' => 'title2'
+                        ]
+                    ]
                 ],
                 ''
             ])
@@ -59,25 +69,9 @@ class CheckboxesFieldUnitTest extends \PHPUnit\Framework\TestCase
         // assertions
         $this->assertStringContainsString('type="checkbox"', $content);
         $this->assertStringContainsString('class="cls"', $content);
-    }
-
-    /**
-     * Testing constructor
-     */
-    public function testConstructorWithTitle()
-    {
-        // setup
-        $field = $this->getFieldMock([
-            [
-                'id' => 1,
-                'title' => 'item-title'
-            ]
-        ]);
-
-        // test body
-        $content = $field->html();
-
-        // assertions
-        $this->assertStringContainsString('item-title', $content);
+        $this->assertStringContainsString('111', $content);
+        $this->assertStringContainsString('222', $content);
+        $this->assertStringContainsString('title1', $content);
+        $this->assertStringContainsString('title2', $content);
     }
 }

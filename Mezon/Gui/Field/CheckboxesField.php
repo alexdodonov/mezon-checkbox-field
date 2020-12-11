@@ -2,6 +2,8 @@
 namespace Mezon\Gui\Field;
 
 use Mezon\Functional\Fetcher;
+use Mezon\Gui\Field;
+use Mezon\Gui\FieldAttributes;
 
 /**
  * Class CheckboxesField
@@ -16,23 +18,8 @@ use Mezon\Functional\Fetcher;
 /**
  * Checkboxes field control
  */
-class CheckboxesField extends RemoteField
+class CheckboxesField extends Field
 {
-    // TODO unbind dependency - make possible to initialize list of records 
-    // - statically
-    // - locally
-
-    /**
-     * Getting list of records
-     *
-     * @return array List of records
-     */
-    protected function getExternalRecords(): array
-    {
-        // @codeCoverageIgnoreStart
-        return $this->getClient()->getAll();
-        // @codeCoverageIgnoreEnd
-    }
 
     /**
      * Method returns record's title
@@ -41,12 +28,38 @@ class CheckboxesField extends RemoteField
      *            Data source
      * @return string Compiled title
      */
-    protected function getExternalTitle(array $record): string
+    private function getRecordTitle(array $record): string
     {
         if (Fetcher::getField($record, 'title') !== null) {
             return Fetcher::getField($record, 'title');
         } else {
             return 'id : ' . Fetcher::getField($record, 'id');
+        }
+    }
+
+    /**
+     * List of items
+     *
+     * @var array
+     */
+    private $items = [];
+
+    /**
+     * Constructor
+     *
+     * @param array $fieldDescription
+     *            Field description
+     * @param string $value
+     *            Field value
+     */
+    public function __construct(array $fieldDescription, string $value = '')
+    {
+        parent::__construct($fieldDescription, $value);
+
+        if (isset($fieldDescription['items'])) {
+            $this->items = $fieldDescription['items'];
+        } else {
+            throw (new \Exception('Field "items" was not found'));
         }
     }
 
@@ -59,14 +72,12 @@ class CheckboxesField extends RemoteField
     {
         $content = '';
 
-        $records = $this->getExternalRecords();
-
-        foreach ($records as $item) {
+        foreach ($this->items as $item) {
             $id = Fetcher::getField($item, 'id');
 
             $content .= '<label>
-                <input type="checkbox" class="'.$this->class.'" name="' . $this->getNamePrefix() . $this->name . '[]" value="' .
-                $id . '" /> ' . $this->getExternalTitle($item) . '
+                <input type="checkbox" class="' . $this->class . '" name="' . $this->getNamePrefix() . $this->name .
+                '[]" value="' . $id . '" /> ' . $this->getRecordTitle($item) . '
             </label><br>';
         }
 
